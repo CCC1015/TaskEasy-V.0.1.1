@@ -1,0 +1,7 @@
+CREATE TABLE goals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    goal TEXT NOT NULL,
+    completed BOOLEAN NOT NULL DEFAULT 0
+);
+
+

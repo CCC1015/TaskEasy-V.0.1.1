@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Taskeasy</title>
+    <style>
+        @keyframes gradientAnimation {
+            0% { background-color: #ff9a9e; }
+            20% { background-color: #fad0c4; }
+            40% { background-color: #fad0c4; }
+            60% { background-color: #fbc2eb; }
+            80% { background-color: #fbc2eb; }
+            100% { background-color: #ff9a9e; }
+        }
+
+        @keyframes placeholderColorChange {
+            0% { color: red; }
+            20% { color: orange; }
+            40% { color: yellow; }
+            60% { color: green; }
+            80% { color: blue; }
+            100% { color: violet; }
+        }
+
+        body {
+            background-color: #CCFFBF;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1, h2 {
+            font-size: 70px;
+            color: #79AC6F;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 20px 0;
+        }
+
+        .content {
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .image-container {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            animation: gradientAnimation 5s ease infinite;
+        }
+
+        input::placeholder {
+            animation: placeholderColorChange 5s ease infinite;
+            color: white;
+        }
+
+        .add-button, .delete-button {
+            background-color: #AD310B;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-button:hover {
+            background-color: #8a2509;
+        }
+
+        .delete-button:hover {
+            background-color: #8a2509;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #79AC6F;
+            margin: 5px 0;
+            color: #CCFFBF;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to TaskEasy</h1>
+
+    <div class="content">
+        <ul id="goal-list">
+            {% for goal in goals %}
+                <li data-id="{{ goal[0] }}">{{ goal[1] }}</li>
+            {% endfor %}
+        </ul>
+
+        <form action="/add_goal" method="post">
+            <input type="text" name="goal" placeholder="New task">
+            <input type="submit" value="Add Goal" class="add-button">
+        </form>
+
+        <button onclick="toggleDeleteMode()" class="delete-button" id="deleteButton">Delete Goal</button>
+    </div>
+
+    <h2>Fitness</h2>
+    <div class="image-container">
+        <img src="https://imgur.com/ZgkXbHK.png" alt="Fitness">
+    </div>
+    <div>
+    <h2>Completed goals go here with a checkmark</h2>
+</div>
+    <script>
+        let deleteMode = false;
+
+        function toggleDeleteMode() {
+            deleteMode = !deleteMode;
+            document.getElementById('deleteButton').textContent = deleteMode ? 'Cancel Delete' : 'Delete Goal';
+            const goals = document.querySelectorAll('#goal-list li');
+            goals.forEach(goal => {
+                if (deleteMode) {
+                    goal.addEventListener('click', handleDeleteClick);
+                } else {
+                    goal.removeEventListener('click', handleDeleteClick);
+                }
+            });
+        }
+
+        function handleDeleteClick(event) {
+            const id = event.target.getAttribute('data-id');
+            fetch('/delete_goal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: id })
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
